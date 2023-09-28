@@ -4,7 +4,7 @@ export interface LoginReq {
 }
 
 export interface LoginResp {
-    id: string
+    id: number
     username: string
     name: string
     email: string
@@ -23,7 +23,7 @@ export interface RegisterReq {
 }
 
 export interface RegisterResp {
-    id: string
+    id: number
     username: string
     name: string
     email: string
