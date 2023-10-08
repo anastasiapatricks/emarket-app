@@ -3,12 +3,12 @@ import { Button, Container, Pagination, Table } from "react-bootstrap"
 import { Order } from "../models/OrderReqResp"
 import { useOrderService } from "../hooks/useOrderService"
 import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
+import moment from 'moment';
 
 export const AdminOrders = () => {
-    const [data, setData] = useState<Order[]>([])
     const orderService = useOrderService()
+    const [data, setData] = useState<Order[]>([])
 
-    // TODO Update delivery status
     const handleButtonClick = async () => {
         refreshData()
     }
@@ -17,25 +17,42 @@ export const AdminOrders = () => {
         const products = await orderService.getAll()
         setData(products)
     }
+    
+    const handleUpdateStatus = async (id: number, newStatus: string) => {
+        await orderService.updateStatus(id, newStatus)
+        await refreshData()
+    }
+
+    const rowActions: OrderRowActions = {
+        onUpdateStatus(id, newStatus) {
+            handleUpdateStatus(id, newStatus)
+        }
+    }
 
     useEffect(() => {
         refreshData()
     }, [])
 
     return <Container>
+        <h1 className="my-3">Orders</h1>
         <Button onClick={handleButtonClick}>Refresh</Button>
-        <OrderTable data={data} />
+        <OrderTable data={data} rowActions={rowActions} />
     </Container>
 }
 
 interface OrderTableProps {
     data: Order[]
+    rowActions: OrderRowActions
 }
 
-const OrderTable = ({ data }: OrderTableProps) => {
+interface OrderRowActions {
+    onUpdateStatus(id: number, newStatus: string): void
+}
+
+const OrderTable = ({ data, rowActions }: OrderTableProps) => {
     const columns = useMemo(() => [
         columnHelper.accessor('id', {
-            header: () => 'ID',
+            header: () => 'Order ID',
         }),
         columnHelper.accessor('items', {
             header: () => 'Product: Qty',
@@ -43,6 +60,7 @@ const OrderTable = ({ data }: OrderTableProps) => {
         }),
         columnHelper.accessor('totalPrice', {
             header: () => 'Total Price',
+            cell: info  => '$' + info.getValue().toFixed(2)
         }),
         columnHelper.accessor('userId', {
             header: () => 'User ID' ,
@@ -52,9 +70,11 @@ const OrderTable = ({ data }: OrderTableProps) => {
         }),
         columnHelper.accessor('createdTimestamp', {
             header: () => 'Created Timestamp',
+            cell: info  => moment.unix(info.getValue()).format('DD MMM YYYY HH:mm')
         }),
         columnHelper.accessor('date', {
             header: () => 'Delivery Date',
+            cell: info  => moment(info.getValue()).format('DD MMM YYYY')
         }),
         columnHelper.accessor('timeslot', {
             header: () => 'Delivery Timeslot',
@@ -62,7 +82,15 @@ const OrderTable = ({ data }: OrderTableProps) => {
         columnHelper.accessor('deliveryStatus', {
             header: () => 'Delivery Status',
         }),
-    ], [])
+        columnHelper.display({
+            id: 'actions',
+            header: () => 'Actions',
+            cell: ({ row }) => <span>
+                <Button onClick={() => rowActions.onUpdateStatus(row.original.id, "SCHEDULED")}>Mark as Scheduled</Button>
+                <Button onClick={() => rowActions.onUpdateStatus(row.original.id, "DELIVERED")}>Mark as Delivered</Button>
+            </span>
+        })
+    ], [rowActions])
 
     const table = useReactTable<Order>({
         data: data,
@@ -96,7 +124,12 @@ const OrderTable = ({ data }: OrderTableProps) => {
                     ))}
                 </thead>
                 <tbody>
-                    {table.getRowModel().rows.map(row => (
+                    {table.getRowModel().rows.length === 0 ? (
+                        <tr>
+                            <td colSpan={columns.length}>No records found</td>
+                        </tr>
+                    ) : (
+                        table.getRowModel().rows.map(row => (
                         <tr key={row.id}>
                             {row.getVisibleCells().map(cell => (
                                 <td key={cell.id}>
@@ -104,7 +137,7 @@ const OrderTable = ({ data }: OrderTableProps) => {
                                 </td>
                             ))}
                         </tr>
-                    ))}
+                    )))}
                 </tbody>
             </Table>
             <Pagination>

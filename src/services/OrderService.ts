@@ -16,11 +16,23 @@ export const newOrderService = (config?: AxiosRequestConfig) => {
             const resp = await client.get('/delivery-order')
             return resp.data as Order[]
         },
+        getAllByUserId: async (userId: number) => {
+            const resp = await client.get(`/delivery-order/history/${userId}`)
+            return resp.data as Order[]
+        },
+        updateStatus: async (id: number, status: string) => {
+            const resp = await client.post(`/delivery-order/update-status/${id}`, status, {
+                headers: {
+                    'Content-Type': 'text/plain',
+                  },
+            })
+            return resp.data as Order
+        },
         create: async (req: OrderReq) => {
-            await client.post('/delivery-order', req)
+            await client.post('/delivery-order/add', req)
         },
         update: async (id: number, req: OrderReq) => {
-            await client.put(`/delivery-order/${id}`, req)
+            await client.post(`/delivery-order/edit/${id}`, req)
         },
         delete: async (id: number) => {
             await client.delete(`/delivery-order/${id}`)
