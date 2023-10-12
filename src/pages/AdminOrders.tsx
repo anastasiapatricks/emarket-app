@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react"
-import { Button, Container, Pagination, Table } from "react-bootstrap"
+import { Button, Container, Form, Pagination, Table } from "react-bootstrap"
 import { Order } from "../models/OrderReqResp"
 import { useOrderService } from "../hooks/useOrderService"
 import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
 import moment from 'moment';
+
+const deliveryStatuses: string[] = ["SCHEDULED", "DELIVERED", "CANCELLED", "FAILED"]
 
 export const AdminOrders = () => {
     const orderService = useOrderService()
@@ -81,12 +83,21 @@ const OrderTable = ({ data, rowActions }: OrderTableProps) => {
         }),
         columnHelper.accessor('deliveryStatus', {
             header: () => 'Delivery Status',
+            cell: info => <span>
+                <Form.Select
+                    value={info.getValue()}
+                    onChange={e => rowActions.onUpdateStatus(info.row.original.id, e.target.value)}
+                >
+                    {deliveryStatuses.map(s => (
+                        <option value={s}>{s}</option>
+                    ))}
+                </Form.Select>
+            </span>
         }),
         columnHelper.display({
             id: 'actions',
             header: () => 'Actions',
             cell: ({ row }) => <span>
-                <Button onClick={() => rowActions.onUpdateStatus(row.original.id, "SCHEDULED")}>Mark as Scheduled</Button>
                 <Button onClick={() => rowActions.onUpdateStatus(row.original.id, "DELIVERED")}>Mark as Delivered</Button>
             </span>
         })
