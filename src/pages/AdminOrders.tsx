@@ -52,6 +52,12 @@ interface OrderRowActions {
 }
 
 const OrderTable = ({ data, rowActions }: OrderTableProps) => {
+    const [editedStatuses, setEditedStatuses] = useState<string[]>([])
+
+    useEffect(() => {
+        setEditedStatuses(data.map(order => order.deliveryStatus))
+    }, [data])
+
     const columns = useMemo(() => [
         columnHelper.accessor('id', {
             header: () => 'Order ID',
@@ -83,13 +89,13 @@ const OrderTable = ({ data, rowActions }: OrderTableProps) => {
         }),
         columnHelper.accessor('deliveryStatus', {
             header: () => 'Delivery Status',
-            cell: info => <span>
+            cell: ({ row }) => <span>
                 <Form.Select
-                    value={info.getValue()}
-                    onChange={e => rowActions.onUpdateStatus(info.row.original.id, e.target.value)}
+                    value={editedStatuses[row.index]}
+                    onChange={e => setEditedStatuses(editedStatuses.map((s, i) => i == row.index ? e.target.value : s))}
                 >
                     {deliveryStatuses.map(s => (
-                        <option value={s}>{s}</option>
+                        <option key={s} value={s}>{s}</option>
                     ))}
                 </Form.Select>
             </span>
@@ -98,10 +104,15 @@ const OrderTable = ({ data, rowActions }: OrderTableProps) => {
             id: 'actions',
             header: () => 'Actions',
             cell: ({ row }) => <span>
-                <Button onClick={() => rowActions.onUpdateStatus(row.original.id, "DELIVERED")}>Mark as Delivered</Button>
+                <Button
+                    disabled={row.original.deliveryStatus == editedStatuses[row.index]}
+                    onClick={() => rowActions.onUpdateStatus(row.original.id, editedStatuses[row.index])}
+                >
+                    Save
+                </Button>
             </span>
         })
-    ], [rowActions])
+    ], [editedStatuses, rowActions])
 
     const table = useReactTable<Order>({
         data: data,
