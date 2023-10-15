@@ -33,6 +33,17 @@ export interface RegisterResp {
     password: string
 }
 
+export interface UserResp {
+    id: number
+    username: string
+    name: string
+    email: string
+    contactNo: string
+    createdDateTime: Date
+    role: string
+    password: string
+}
+
 export interface BaseResp {
     message: string
     payload: unknown
