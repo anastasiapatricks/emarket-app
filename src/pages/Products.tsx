@@ -3,7 +3,6 @@ import { useProductService } from "../hooks/useProductService"
 import { useEffect, useMemo, useState } from "react"
 import { Product } from "../models/ProductReqResp"
 import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
-import moment from 'moment';
 import { useUserAuth } from "../hooks/useUserAuth"
 
 export const Products = () => {
