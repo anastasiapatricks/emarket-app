@@ -1,9 +1,10 @@
 import axios, { AxiosRequestConfig } from "axios"
 import { Product, ProductParam } from "../models/ProductReqResp"
+import Config from "../config"
 
 export const newProductService = (config?: AxiosRequestConfig) => {
     const client = axios.create({
-        baseURL: 'http://localhost:9002',
+        baseURL: Config.ApiBaseUrls.Product,
         ...config,
     })
 

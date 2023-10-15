@@ -1,9 +1,10 @@
 import axios, { AxiosRequestConfig } from "axios"
 import { Order, OrderReq } from "../models/OrderReqResp"
+import Config from "../config"
 
 export const newOrderService = (config?: AxiosRequestConfig) => {
     const client = axios.create({
-        baseURL: 'http://localhost:8080',
+        baseURL: Config.ApiBaseUrls.Order,
         ...config,
     })
 
