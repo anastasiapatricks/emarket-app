@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react"
-import { Button, Container, Pagination, Table } from "react-bootstrap"
+import { Button, Container, Form, Pagination, Table } from "react-bootstrap"
 import { Order } from "../models/OrderReqResp"
 import { useOrderService } from "../hooks/useOrderService"
 import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
 import moment from 'moment';
+
+const deliveryStatuses: string[] = ["SCHEDULED", "DELIVERED", "CANCELLED", "FAILED"]
 
 export const AdminOrders = () => {
     const orderService = useOrderService()
@@ -50,6 +52,12 @@ interface OrderRowActions {
 }
 
 const OrderTable = ({ data, rowActions }: OrderTableProps) => {
+    const [editedStatuses, setEditedStatuses] = useState<string[]>([])
+
+    useEffect(() => {
+        setEditedStatuses(data.map(order => order.deliveryStatus))
+    }, [data])
+
     const columns = useMemo(() => [
         columnHelper.accessor('id', {
             header: () => 'Order ID',
@@ -81,16 +89,30 @@ const OrderTable = ({ data, rowActions }: OrderTableProps) => {
         }),
         columnHelper.accessor('deliveryStatus', {
             header: () => 'Delivery Status',
+            cell: ({ row }) => <span>
+                <Form.Select
+                    value={editedStatuses[row.index]}
+                    onChange={e => setEditedStatuses(editedStatuses.map((s, i) => i == row.index ? e.target.value : s))}
+                >
+                    {deliveryStatuses.map(s => (
+                        <option key={s} value={s}>{s}</option>
+                    ))}
+                </Form.Select>
+            </span>
         }),
         columnHelper.display({
             id: 'actions',
             header: () => 'Actions',
             cell: ({ row }) => <span>
-                <Button onClick={() => rowActions.onUpdateStatus(row.original.id, "SCHEDULED")}>Mark as Scheduled</Button>
-                <Button onClick={() => rowActions.onUpdateStatus(row.original.id, "DELIVERED")}>Mark as Delivered</Button>
+                <Button
+                    disabled={row.original.deliveryStatus == editedStatuses[row.index]}
+                    onClick={() => rowActions.onUpdateStatus(row.original.id, editedStatuses[row.index])}
+                >
+                    Save
+                </Button>
             </span>
         })
-    ], [rowActions])
+    ], [editedStatuses, rowActions])
 
     const table = useReactTable<Order>({
         data: data,

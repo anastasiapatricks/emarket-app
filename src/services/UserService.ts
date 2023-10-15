@@ -1,9 +1,10 @@
 import axios, { AxiosRequestConfig } from "axios"
-import { BaseResp, LoginReq, LoginResp, RegisterReq, RegisterResp } from "../models/UserReqResp"
+import { BaseResp, LoginReq, LoginResp, RegisterReq, RegisterResp, UserResp } from "../models/UserReqResp"
+import Config from "../config"
 
 export const newUserService = (config?: AxiosRequestConfig) => {
     const client = axios.create({
-        baseURL: 'http://localhost:9001',
+        baseURL: Config.ApiBaseUrls.User,
         ...config,
     })
 
@@ -26,6 +27,11 @@ export const newUserService = (config?: AxiosRequestConfig) => {
             }
             const payload = data.payload as LoginResp
             return payload
-        }
+        },
+
+        getUserById: async (id: number) => {
+            const resp = await client.get(`/api/user/retrieve/${id}`)
+            return resp.data as UserResp
+        },
     }
 }

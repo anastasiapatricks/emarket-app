@@ -1,9 +1,9 @@
 import { AxiosRequestConfig } from "axios"
 import { useMemo } from "react"
-import { newProductService } from "../services/ProductService"
 import { useUserAuth } from "./useUserAuth"
+import { newUserService } from "../services/UserService"
 
-export const useProductService = () => {
+export const useUserService = () => {
     const { token } = useUserAuth()
 
     return useMemo(() => {
@@ -13,6 +13,6 @@ export const useProductService = () => {
                 'Authorization': 'Bearer ' + token
             }
         }
-        return newProductService(config)
-    }, [token])
+        return newUserService(config)
+    } , [token])
 }

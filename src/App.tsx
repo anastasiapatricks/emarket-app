@@ -1,5 +1,5 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import { NavbarWrapper } from './components/NavbarWrapper'
+import { PageWrapper } from './components/PageWrapper'
 import { RequireUserWrapper } from './components/RequireUserWrapper'
 import { WithoutAuth } from './components/WithoutAuth'
 import { UserAuthProvider } from './hooks/UserAuthContext'
@@ -10,13 +10,15 @@ import { Login } from './pages/Login'
 import { Orders } from './pages/Orders'
 import { Products } from './pages/Products'
 import { Register } from './pages/Register'
+import { Cart } from './pages/Cart'
+import { Checkout } from './pages/Checkout'
 
 import 'bootstrap-icons/font/bootstrap-icons.min.css'
-import 'bootstrap/dist/css/bootstrap.min.css'
+import './scss/ecoharvest.scss'
 
 const router = createBrowserRouter([
   {
-    element: <NavbarWrapper />,
+    element: <PageWrapper />,
     children: [
       {
         path: '/',
@@ -59,6 +61,14 @@ const router = createBrowserRouter([
           {
             path: 'orders',
             element: <Orders />
+          },
+          {
+            path: 'cart',
+            element: <Cart />
+          },
+          {
+            path: 'checkout/:cartId',
+            element: <Checkout />
           }
         ]
       }
