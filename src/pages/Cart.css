@@ -1,0 +1,26 @@
+.product-list {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr 1fr;
+    align-items: baseline;
+    row-gap: 1rem;
+    column-gap: 1rem;
+}
+
+.header {
+    font-weight: bolder;
+}
+
+.divider {
+    grid-column: 1 / -1;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.total-label {
+    grid-column: 1 / -2;
+    text-align: end;
+    font-weight: bolder;
+}
+
+.total-value {
+    grid-column: -2 / -1;
+}
