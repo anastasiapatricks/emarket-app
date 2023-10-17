@@ -1,0 +1,43 @@
+.user-profile {
+    background-color: #fff;
+    max-width: 400px;
+    margin: 5rem auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .user-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto;
+    display: block;
+    border: 2px solid black;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .user-details {
+    text-align: left;
+    margin-top: 20px;
+  }
+  
+  h1 {
+    font-size: 24px;
+
+    margin-bottom: 20px;
+  }
+  
+  p {
+    margin: 10px 0;
+  }
+  
+  strong {
+    font-weight: bold;
+  }
+
+  td {
+    text-align: left;
+    padding: 0.2rem 0.5rem;
+  }
