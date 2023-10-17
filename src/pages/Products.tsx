@@ -1,9 +1,10 @@
-import { Container, Pagination, Table } from "react-bootstrap"
+import { Card, Container, Pagination, Table } from "react-bootstrap"
 import { useProductService } from "../hooks/useProductService"
 import { useEffect, useMemo, useState } from "react"
 import { Product } from "../models/ProductReqResp"
 import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
 import { useUserAuth } from "../hooks/useUserAuth"
+
 
 export const Products = () => {
     const { user } = useUserAuth()
@@ -61,8 +62,38 @@ const ProductTable = ({ data }: ProductTableProps) => {
     })
 
     return (
-        <>
-            <Table hover>
+        <div>
+            <div style={{ display:"flex", flexWrap:'wrap' }}>
+                {data.map((product) => {
+                    if (data.length === 0) {
+                        return(
+                            <p>No Records Found</p>
+                        );
+                    } else {
+                        return (
+                            <Card style={{ width: '18rem', marginRight:'2rem', marginBottom: '1rem', textAlign: 'center'}}>
+                            <Card.Img variant="top" src="holder.js/100px180" />
+                            <Card.Body>
+                              <Card.Title>{product.productName}</Card.Title>
+                              <Card.Text>
+                                {product.description}
+                              </Card.Text>
+                              <Card.Text>${product.price.toFixed(2)}</Card.Text>
+                              <button>Add To Cart</button>
+                            </Card.Body>
+                          </Card>
+                        );
+                    }
+                })}
+            </div>
+        </div>
+    )
+}
+
+const columnHelper = createColumnHelper<Product>()
+
+/**
+<Table hover>
                 <thead>
                     {table.getHeaderGroups().map(headerGroup => (
                         <tr key={headerGroup.id}>
@@ -98,15 +129,4 @@ const ProductTable = ({ data }: ProductTableProps) => {
                     )))}
                 </tbody>
             </Table>
-            <Pagination>
-                <Pagination.First onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()} />
-                <Pagination.Prev onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()} />
-                <Pagination.Item>{table.getState().pagination.pageIndex + 1}</Pagination.Item>
-                <Pagination.Next onClick={() => table.nextPage()} disabled={!table.getCanNextPage()} />
-                <Pagination.Last onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()} />
-            </Pagination>
-        </>
-    )
-}
-
-const columnHelper = createColumnHelper<Product>()
+ */
