@@ -56,7 +56,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: 'products',
-            element: <Products />
+            element: <Products productsPerPage={12}/>
           },
           {
             path: 'orders',
