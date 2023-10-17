@@ -69,7 +69,10 @@ export const Products: React.FC<ProductsProps> = ({ productsPerPage }) => {
             } else {
                 return (
                     <Card style={{ width: '18rem', marginRight:'2rem', marginBottom: '1rem', textAlign: 'center'}}>
-                    <Card.Img variant="top" src="holder.js/100px180" />
+                    <Card.Img variant="top" src="holder.js/100px180" onError={({ currentTarget }) => {
+                        currentTarget.onerror = null; // prevents looping
+                        currentTarget.src="https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg";
+                    }}/>
                     <Card.Body>
                       <Card.Title>{product.productName}</Card.Title>
                       <Card.Text>
