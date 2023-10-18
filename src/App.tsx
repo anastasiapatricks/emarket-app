@@ -12,6 +12,7 @@ import { Products } from './pages/Products'
 import { Register } from './pages/Register'
 import { Cart } from './pages/Cart'
 import { Checkout } from './pages/Checkout'
+import { CheckoutSuccess } from './pages/CheckoutSuccess'
 
 import 'bootstrap-icons/font/bootstrap-icons.min.css'
 import './scss/ecoharvest.scss'
@@ -67,8 +68,12 @@ const router = createBrowserRouter([
             element: <Cart />
           },
           {
-            path: 'checkout/:cartId',
+            path: 'checkout',
             element: <Checkout />
+          },
+          {
+            path: 'checkout/success',
+            element: <CheckoutSuccess />
           }
         ]
       }
