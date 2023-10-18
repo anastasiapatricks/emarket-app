@@ -222,13 +222,13 @@ const OrderTable = ({ data }: OrderTableProps) => {
             header: () => 'Product Name',
         }),
         columnHelper.accessor('productDesc', {
-            header: () => 'Product Description',
+            header: () => 'Description',
         }),
         columnHelper.accessor('productPrice', {
-            header: () => 'Product Price',
+            header: () => 'Price',
         }),
         columnHelper.accessor('productQty', {
-            header: () => 'Product Quantity',
+            header: () => 'Quantity',
         }),
         columnHelper.accessor('productSubtotal', {
             header: () => 'Subtotal',
