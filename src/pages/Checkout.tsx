@@ -1,7 +1,7 @@
 import { Alert, Button, Card, Container, Form, Table } from "react-bootstrap"
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { newOrderService } from "../services/OrderService"
+// import { newOrderService } from "../services/OrderService"
 import { DeliveryOrderRequest, ItemRequest } from "../models/OrderReqResp"
 import { useProductService } from "../hooks/useProductService"
 import { Product } from "../models/ProductReqResp"
@@ -52,14 +52,15 @@ export const Checkout = () => {
     const navigate = useNavigate()
 
     const { user } = useUserAuth()
-    const orderService = newOrderService()
+    // const orderService = newOrderService()
     const productService = useProductService()
 
     const getUser = localStorage.getItem('user');
     const userData = getUser ? JSON.parse(getUser) : null;
 
     const [products, setProducts] = useState<Product[]>([]);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null)
+    const [errorMsg] = useState<string | null>(null)
+    // const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
     const itemRequest: ItemRequest[] = [];
 
