@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Container, Form, Table } from "react-bootstrap"
+import { Alert, Button, Card, Col, Container, Form, Row, Table } from "react-bootstrap"
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 // import { newOrderService } from "../services/OrderService"
@@ -25,6 +25,13 @@ interface Cart {
     createdDate: Date
     updatedDate: Date
     status: string
+}
+
+interface Payment {
+    creditCardNumber: string,
+    cvvCode: string,
+    expiryDate: string,
+    creditCardName: string,
 }
 
 const MockCart: Cart = {
@@ -120,6 +127,13 @@ export const Checkout = () => {
 
     }).filter((item) => item.productQty !== 0);
 
+    const [paymentData, setPaymentData] = useState<Payment>({
+        creditCardNumber: "",
+        cvvCode: "",
+        expiryDate: "",
+        creditCardName: ""
+    })
+
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({
@@ -134,6 +148,55 @@ export const Checkout = () => {
             ...formData,
             [name]: value,
         });
+    };
+
+    const handlePaymentChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setPaymentData({
+            ...paymentData,
+            [name]: value,
+        });
+    };
+
+    const handleCreditCardNumberChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const replaced = value.replace(/[^\d-]/g, '');
+        const formattedValue = replaced.replace(/-/g, '').match(/.{1,4}/g);
+        const formattedCreditCardNumber = formattedValue ? formattedValue.join('-') : '';
+
+        setPaymentData({
+            ...paymentData,
+            [name]: formattedCreditCardNumber,
+        });
+    };
+
+    const handleCvvCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const replaced = value.replace(/\D/g, '');
+
+        setPaymentData({
+            ...paymentData,
+            [name]: replaced,
+        });
+    };
+
+    const handleExpiryDateChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const replaced = value.replace(/\D/g, '');
+
+        if (replaced.length <= 2) {
+            setPaymentData({
+                ...paymentData,
+                [name]: replaced,
+            });
+        } else if (replaced.length <= 4) {
+            const formattedValue = `${replaced.slice(0, 2)}/${replaced.slice(2)}`;
+
+            setPaymentData({
+                ...paymentData,
+                [name]: formattedValue,
+            });
+        }
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -153,8 +216,7 @@ export const Checkout = () => {
         })
     }
 
-    console.log(formData);
-    console.log(orderItems);
+    console.log(paymentData);
 
     return (
         <Container>
@@ -162,7 +224,7 @@ export const Checkout = () => {
             <Form onSubmit={handleSubmit}>
                 <Card className="shadow-sm mt-4 p-3">
                     <Card.Body>
-                        <h2 className="mb-3">Delivery Details</h2>
+                        <h2 className="mb-3">Delivery</h2>
                         {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
                         <Form.Group className="mb-3" controlId="name">
                             <Form.Label>Address</Form.Label>
@@ -195,16 +257,81 @@ export const Checkout = () => {
 
                 <Card className="shadow-sm mt-4 p-3">
                     <Card.Body>
-                        <h2 className="mb-3">Order Details</h2>
+                        <h2 className="mb-3">Products Ordered</h2>
                         <OrderTable data={orderItems} />
                         <div className="divider" />
                         <div className="total-label flex-row-reverse">Total: ${orderItems.reduce((acc, product) => acc + product.productSubtotal, 0)}</div>
                     </Card.Body>
                 </Card>
+
+                <Card className="shadow-sm mt-4 p-3">
+                    <Card.Body>
+                        <h2 className="mb-3">Payment</h2>
+                        {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
+                        <Form.Group className="mb-3" controlId="creditCardNumber">
+                            <Form.Label>Credit Card Number</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="creditCardNumber"
+                                value={paymentData.creditCardNumber}
+                                onChange={handleCreditCardNumberChange}
+                                minLength={19}
+                                maxLength={19}
+                                placeholder="XXXX-XXXX-XXXX-XXXX"
+                                required
+                            />
+                        </Form.Group>
+
+                        <Row>
+                            <Col>
+                                <Form.Group className="mb-3" controlId="cvvCode">
+                                    <Form.Label>CVV Code</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="cvvCode"
+                                        value={paymentData.cvvCode}
+                                        onChange={handleCvvCodeChange}
+                                        minLength={3}
+                                        maxLength={3}
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+
+                            <Col>
+                                <Form.Group className="mb-3" controlId="expiryDate">
+                                    <Form.Label>Expiry Date</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="expiryDate"
+                                        value={paymentData.expiryDate}
+                                        onChange={handleExpiryDateChange}
+                                        minLength={5}
+                                        maxLength={5}
+                                        placeholder="MM/YY"
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <Form.Group className="mb-3" controlId="creditCardName">
+                            <Form.Label>Name on Card</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="creditCardName"
+                                value={paymentData.creditCardName}
+                                onChange={handlePaymentChange}
+                                required
+                            />
+                        </Form.Group>
+                    </Card.Body>
+                </Card>
+
                 <br />
                 <div className="d-flex flex-row-reverse">
                     <Button variant="primary" type="submit">
-                        Confirm Order
+                        Place Order
                     </Button>
                 </div>
             </Form>
