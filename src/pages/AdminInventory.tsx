@@ -30,7 +30,7 @@ export const AdminInventory = () => {
         reqList.push(req)
         await inventoryService.subtractInventory(reqList)
         await refreshData()
-        setShowCreateModal(false)
+        setShowSubtractModal(false)
     }
 
     useEffect(() => {
@@ -175,7 +175,7 @@ const InventoryModal = ({ existing, show, onCancel, onSubmit }: InventoryModalPr
                     </Form.Group>
 
                     <Form.Group className="mb-3" controlId="amountToUpdate">
-                        <Form.Label>Amount to Add</Form.Label>
+                        <Form.Label>Amount to {existing === 'add' ? 'Add' : 'Subtract'}</Form.Label>
                         <Form.Control
                             type="number"
                             name="amountToUpdate"

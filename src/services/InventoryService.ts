@@ -15,7 +15,6 @@ export const newInventoryService = (config?: AxiosRequestConfig) => {
         },
         getAll: async () => {
             const resp = await client.get('/api/inventory')
-            console.log(resp)
             return resp.data as InventoryResponse[]
         },
         addInventory: async (req: Inventory[]) => {
