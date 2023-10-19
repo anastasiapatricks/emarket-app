@@ -15,6 +15,7 @@ import { Checkout } from './pages/Checkout'
 
 import 'bootstrap-icons/font/bootstrap-icons.min.css'
 import './scss/ecoharvest.scss'
+import { AdminInventory } from './pages/AdminInventory'
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
           {
             path: 'orders',
             element: <AdminOrders />
+          },
+          {
+            path: 'inventory',
+            element: <AdminInventory />
           }
         ]
       },
