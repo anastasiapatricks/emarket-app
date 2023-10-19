@@ -22,7 +22,15 @@ const Header = () => {
   return (
     <Navbar expand="lg" className="bg-white shadow-sm">
       <Container>
-        <Navbar.Brand as={Link} to='/'>EcoHarvest</Navbar.Brand>
+        <Navbar.Brand as={Link} to='/'>
+          <img 
+            src="/ecoharvest.svg"
+            width="30"
+            height="30"
+            className="d-inline-block align-top me-2"
+          />
+          EcoHarvest
+        </Navbar.Brand>
         <Navbar.Toggle />
         <Navbar.Collapse className="justify-content-end">
           <Nav className="me-auto">
