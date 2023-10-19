@@ -1,20 +1,26 @@
-import { Container, Pagination, Table } from "react-bootstrap"
-import { useProductService } from "../hooks/useProductService"
-import { useEffect, useMemo, useState } from "react"
-import { Product } from "../models/ProductReqResp"
-import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table"
-import moment from 'moment';
+// Products.tsx
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Container } from 'react-bootstrap';
 import { useUserAuth } from "../hooks/useUserAuth"
+import { useProductService } from "../hooks/useProductService"
+import { Product } from "../models/ProductReqResp"
 
-export const Products = () => {
-    const { user } = useUserAuth()
-    const ProductService = useProductService()
-    const [data, setData] = useState<Product[]>([])
-    
-    const refreshData = async () => {
+
+interface ProductsProps {
+  productsPerPage: number;
+}
+
+export const Products: React.FC<ProductsProps> = ({ productsPerPage }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  const { user } = useUserAuth()
+  const ProductService = useProductService()
+
+  const refreshData = async () => {
         if (user?.id) {
             const products = await ProductService.getAll()
-            setData(products)
+            setProducts(products)
         }
     }
 
@@ -22,92 +28,97 @@ export const Products = () => {
         refreshData()
     }, [])
 
-    return <Container>
-        <h1 className="my-3">Product Catalogue</h1>
-        <ProductTable data={data} />
-    </Container>
-}
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
 
-interface ProductTableProps {
-    data: Product[]
-}
+  const totalPages = Math.ceil(products.length / productsPerPage);
 
-const ProductTable = ({ data }: ProductTableProps) => {
-    const columns = useMemo(() => [
-        columnHelper.accessor('id', {
-            header: () => 'Product ID',
-        }),
-        columnHelper.accessor('productName', {
-            header: () => 'Product Name',
-        }),
-        columnHelper.accessor('description', {
-            header: () => 'Description',
-        }),
-        columnHelper.accessor('price', {
-            header: () => 'Price',
-            cell: info  => '$' + info.getValue().toFixed(2)
-        })
-    ], [])
+  const paginate = (pageNumber: number) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
 
-    const table = useReactTable<Product>({
-        data: data,
-        columns: columns,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        initialState: {
-            pagination: {
-                pageSize: 10
+  const goToFirstPage = () => {
+    paginate(1);
+  };
+
+  const goToLastPage = () => {
+    paginate(totalPages);
+  };
+
+  const goToPreviousPage = () => {
+    paginate(currentPage - 1);
+  };
+
+  const goToNextPage = () => {
+    paginate(currentPage + 1);
+  };
+
+
+  return (
+    <Container>
+        <h1 className='my-3'>Product Catalogue</h1>
+        <div style={{ display:'flex', flexWrap: 'wrap' }}>
+        {currentProducts.map((product) => {
+            if (products.length === 0) {
+                return(
+                    <p>No Records Found</p>
+                );
+            } else {
+                return (
+                    <Card style={{ width: '18rem', marginRight:'2rem', marginBottom: '1rem', textAlign: 'center'}}>
+                    <Card.Img variant="top" src="holder.js/100px180" onError={({ currentTarget }) => {
+                        currentTarget.onerror = null; // prevents looping
+                        currentTarget.src="https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg";
+                    }}/>
+                    <Card.Body>
+                      <Card.Title>{product.productName}</Card.Title>
+                      <Card.Text>
+                        {product.description}
+                      </Card.Text>
+                      <Card.Text>${product.price.toFixed(2)}</Card.Text>
+                      <button>Add To Cart</button>
+                    </Card.Body>
+                  </Card>
+                );
             }
-        }
-    })
-
-    return (
-        <>
-            <Table hover>
-                <thead>
-                    {table.getHeaderGroups().map(headerGroup => (
-                        <tr key={headerGroup.id}>
-                            {headerGroup.headers.map(header => (
-                                <th key={header.id} colSpan={header.colSpan}>
-                                    {header.isPlaceholder
-                                        ? null
-                                        : flexRender(
-                                            header.column.columnDef.header,
-                                            header.getContext()
-                                        )}
-                                </th>
-                            ))}
-                            <th></th>
-                        </tr>
-                    ))}
-                </thead>
-                <tbody>
-                    {table.getRowModel().rows.length === 0 ? (
-                        <tr>
-                            <td colSpan={columns.length}>No records found</td>
-                        </tr>
-                    ) : (
-                        table.getRowModel().rows.map(row => (
-                        <tr key={row.id}>
-                            {row.getVisibleCells().map(cell => (
-                                <td key={cell.id}>
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
-                            ))}
-                            <td><button>Add to Cart</button></td>
-                        </tr>
-                    )))}
-                </tbody>
-            </Table>
-            <Pagination>
-                <Pagination.First onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()} />
-                <Pagination.Prev onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()} />
-                <Pagination.Item>{table.getState().pagination.pageIndex + 1}</Pagination.Item>
-                <Pagination.Next onClick={() => table.nextPage()} disabled={!table.getCanNextPage()} />
-                <Pagination.Last onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()} />
-            </Pagination>
-        </>
-    )
-}
-
-const columnHelper = createColumnHelper<Product>()
+        })}
+        </div>
+        <div>
+        {products.length > productsPerPage && (
+            <ul className="pagination">
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                <Button className="page-link" onClick={goToFirstPage}>
+                    {"<<"}
+                </Button>
+                </li>
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                <Button className="page-link" onClick={goToPreviousPage}>
+                    {"<<"}
+                </Button>
+                </li>
+                {Array.from({ length: totalPages }).map((_, index) => (
+                     <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
+                     <Button className="page-link" onClick={() => paginate(index + 1)}>
+                       {index + 1}
+                     </Button>
+                   </li>
+                ))}
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                <Button className="page-link" onClick={goToNextPage}>
+                    {">"}
+                </Button>
+                </li>
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                <Button className="page-link" onClick={goToLastPage}>
+                    {">>"}
+                </Button>
+                </li>
+            </ul>
+        )}
+        </div>
+    </Container>
+  );
+};

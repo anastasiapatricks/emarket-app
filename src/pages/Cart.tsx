@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { useProductService } from "../hooks/useProductService"
 
 import './Cart.css'
+import { useNavigate } from "react-router-dom"
 
 export const Cart = () => {
   return <Container>
@@ -35,6 +36,7 @@ const MockCart: Cart = {
 const ViewCart = () => {
   const [productCounts, setProductCounts] = useState<ProductCount[]>([])
   const productService = useProductService()
+  const navigate = useNavigate();
 
   const refreshProductCounts = useCallback(async () => {
     const cart: Cart = MockCart
@@ -49,13 +51,17 @@ const ViewCart = () => {
     refreshProductCounts()
   }, [refreshProductCounts])
 
+  const handleCheckoutClick = () => {
+    navigate(`/user/checkout`)
+  }
+
   return (
     <Card className="shadow-sm mt-4 p-3">
       <Card.Body>
         <h2 className="mb-3">Added Items</h2>
         <ProductList productCounts={productCounts} onSetProductCounts={setProductCounts} />
         <div className="d-flex flex-row-reverse">
-          <Button variant="primary">Checkout</Button>
+          <Button variant="primary" onClick={handleCheckoutClick}>Checkout</Button>
         </div>
       </Card.Body>
     </Card>

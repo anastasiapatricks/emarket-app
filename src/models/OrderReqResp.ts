@@ -41,3 +41,16 @@ export interface Item {
     quantity: number
     price: number
 }
+
+export interface DeliveryOrderRequest {
+    userId: number
+    items: ItemRequest[]
+    date: Date
+    timeslot: string
+    address: string
+}
+
+export interface ItemRequest {
+    productId: string
+    quantity: number
+}

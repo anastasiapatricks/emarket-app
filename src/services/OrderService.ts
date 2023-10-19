@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios"
-import { Order, OrderReq } from "../models/OrderReqResp"
+import { DeliveryOrderRequest, Order, OrderReq } from "../models/OrderReqResp"
 import Config from "../config"
 
 export const newOrderService = (config?: AxiosRequestConfig) => {
@@ -29,7 +29,7 @@ export const newOrderService = (config?: AxiosRequestConfig) => {
             })
             return resp.data as Order
         },
-        create: async (req: OrderReq) => {
+        create: async (req: DeliveryOrderRequest) => {
             await client.post('/delivery-order/add', req)
         },
         update: async (id: number, req: OrderReq) => {
