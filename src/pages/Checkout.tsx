@@ -7,6 +7,7 @@ import { useProductService } from "../hooks/useProductService"
 import { Product } from "../models/ProductReqResp"
 import { useUserAuth } from "../hooks/useUserAuth"
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import LoadingModal from "../components/Loading/LoadingModal"
 
 interface OrderItems {
     id: string,
@@ -68,6 +69,7 @@ export const Checkout = () => {
 
     const [products, setProducts] = useState<Product[]>([]);
     const [errorMsg, setErrorMsg] = useState<string | null>(null)
+    const [isLoading, setIsLoading] = useState(false);
 
     const itemRequest: ItemRequest[] = [];
 
@@ -209,9 +211,10 @@ export const Checkout = () => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setIsLoading(true);
 
         try {
-            await orderService.create(formData)
+            await orderService.create(formData, isLoading, setIsLoading)
         } catch (error) {
             setErrorMsg((error as Error).message)
             throw error
@@ -226,6 +229,7 @@ export const Checkout = () => {
 
     return (
         <Container>
+            {isLoading && (<LoadingModal />)}
             <h1 className="mt-5">Checkout</h1>
             <Form onSubmit={handleSubmit}>
                 <Card className="shadow-sm mt-4 p-3">
