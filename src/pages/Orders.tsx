@@ -10,7 +10,7 @@ export const Orders = () => {
     const { user } = useUserAuth()
     const orderService = useOrderService()
     const [data, setData] = useState<Order[]>([])
-    
+
     const refreshData = async () => {
         if (user?.id) {
             const products = await orderService.getAllByUserId(user.id)
@@ -20,8 +20,8 @@ export const Orders = () => {
 
     useEffect(() => {
         refreshData()
-    }, [])
-    
+    }, [orderService])
+
     return <Container>
         <h1 className="my-3">My Orders</h1>
         <OrderTable data={data} />
@@ -44,18 +44,18 @@ const OrderTable = ({ data }: OrderTableProps) => {
         }),
         columnHelper.accessor('totalPrice', {
             header: () => 'Total Price',
-            cell: info  => '$' + info.getValue().toFixed(2)
+            cell: info => '$' + info.getValue().toFixed(2)
         }),
         columnHelper.accessor('address', {
             header: () => 'Address',
         }),
         columnHelper.accessor('createdTimestamp', {
             header: () => 'Created Timestamp',
-            cell: info  => moment.unix(info.getValue()).format('DD MMM YYYY HH:mm')
+            cell: info => moment.unix(info.getValue()).format('DD MMM YYYY HH:mm')
         }),
         columnHelper.accessor('date', {
             header: () => 'Delivery Date',
-            cell: info  => moment(info.getValue()).format('DD MMM YYYY')
+            cell: info => moment(info.getValue()).format('DD MMM YYYY')
         }),
         columnHelper.accessor('timeslot', {
             header: () => 'Delivery Timeslot',
@@ -103,14 +103,14 @@ const OrderTable = ({ data }: OrderTableProps) => {
                         </tr>
                     ) : (
                         table.getRowModel().rows.map(row => (
-                        <tr key={row.id}>
-                            {row.getVisibleCells().map(cell => (
-                                <td key={cell.id}>
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
-                            ))}
-                        </tr>
-                    )))}
+                            <tr key={row.id}>
+                                {row.getVisibleCells().map(cell => (
+                                    <td key={cell.id}>
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </td>
+                                ))}
+                            </tr>
+                        )))}
                 </tbody>
             </Table>
             <Pagination>

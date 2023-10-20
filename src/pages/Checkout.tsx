@@ -1,7 +1,7 @@
 import { Alert, Button, Card, Col, Container, Form, Row, Table } from "react-bootstrap"
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-// import { newOrderService } from "../services/OrderService"
+import { newOrderService } from "../services/OrderService"
 import { DeliveryOrderRequest, ItemRequest } from "../models/OrderReqResp"
 import { useProductService } from "../hooks/useProductService"
 import { Product } from "../models/ProductReqResp"
@@ -57,17 +57,17 @@ const timeslot = [
 
 export const Checkout = () => {
     const navigate = useNavigate()
+    const today = new Date()
 
     const { user } = useUserAuth()
-    // const orderService = newOrderService()
+    const orderService = newOrderService()
     const productService = useProductService()
 
     const getUser = localStorage.getItem('user');
     const userData = getUser ? JSON.parse(getUser) : null;
 
     const [products, setProducts] = useState<Product[]>([]);
-    const [errorMsg] = useState<string | null>(null)
-    // const [errorMsg, setErrorMsg] = useState<string | null>(null)
+    const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
     const itemRequest: ItemRequest[] = [];
 
@@ -90,10 +90,18 @@ export const Checkout = () => {
         itemRequest.push(item);
     }
 
+    const formatDate = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+
     const [formData, setFormData] = useState<DeliveryOrderRequest>({
         userId: userData ? userData.id : 0,
         items: itemRequest,
-        date: new Date(),
+        date: formatDate(today),
         timeslot: '',
         address: ''
     })
@@ -202,12 +210,12 @@ export const Checkout = () => {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        // try {
-        //     await orderService.create(formData)
-        // } catch (error) {
-        //     setErrorMsg((error as Error).message)
-        //     throw error
-        // }
+        try {
+            await orderService.create(formData)
+        } catch (error) {
+            setErrorMsg((error as Error).message)
+            throw error
+        }
 
         navigate('/user/checkout/success', {
             state: {
@@ -215,8 +223,6 @@ export const Checkout = () => {
             }
         })
     }
-
-    console.log(paymentData);
 
     return (
         <Container>

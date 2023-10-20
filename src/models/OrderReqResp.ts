@@ -45,7 +45,7 @@ export interface Item {
 export interface DeliveryOrderRequest {
     userId: number
     items: ItemRequest[]
-    date: Date
+    date: string
     timeslot: string
     address: string
 }
