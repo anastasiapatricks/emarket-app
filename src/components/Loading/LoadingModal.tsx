@@ -1,4 +1,3 @@
-import React from 'react';
 import './LoadingModal.scss';
 
 const LoadingModal = () => {
