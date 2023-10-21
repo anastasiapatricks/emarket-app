@@ -1,13 +1,15 @@
-import { Alert, Button, Card, Col, Container, Form, Row, Table } from "react-bootstrap"
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { newOrderService } from "../services/OrderService"
-import { DeliveryOrderRequest, ItemRequest } from "../models/OrderReqResp"
-import { useProductService } from "../hooks/useProductService"
-import { Product } from "../models/ProductReqResp"
-import { useUserAuth } from "../hooks/useUserAuth"
-import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import {Alert, Button, Card, Col, Container, Form, Row, Table} from "react-bootstrap"
+import {ChangeEvent, FormEvent, useEffect, useMemo, useState} from "react"
+import {useNavigate} from "react-router-dom"
+import {newOrderService} from "../services/OrderService"
+import {DeliveryOrderRequest, ItemRequest} from "../models/OrderReqResp"
+import {useProductService} from "../hooks/useProductService"
+import {Product} from "../models/ProductReqResp"
+import {useUserAuth} from "../hooks/useUserAuth"
+import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table"
 import LoadingModal from "../components/Loading/LoadingModal"
+import {CartItem} from "../models/CartReqResp.ts";
+import {cartService} from "../services/CartService.ts";
 
 interface OrderItems {
     id: string,
@@ -18,16 +20,6 @@ interface OrderItems {
     productSubtotal: number,
 }
 
-interface Cart {
-    cartId: string
-    userId: string
-    productIds: string[]
-    quantities: number[]
-    createdDate: Date
-    updatedDate: Date
-    status: string
-}
-
 interface Payment {
     creditCardNumber: string,
     cvvCode: string,
@@ -35,47 +27,54 @@ interface Payment {
     creditCardName: string,
 }
 
-const MockCart: Cart = {
-    cartId: "1",
-    userId: "7",
-    productIds: ["652e95911581362133f17092", "652e95a41581362133f17093", "652e96111581362133f1709a"],
-    quantities: [3, 5, 6],
-    createdDate: new Date(),
-    updatedDate: new Date(),
-    status: "Active"
-}
+// const MockCart: Cart = {
+//     cartId: "1",
+//     userId: "7",
+//     productIds: ["652e95911581362133f17092", "652e95a41581362133f17093", "652e96111581362133f1709a"],
+//     quantities: [3, 5, 6],
+//     createdDate: new Date(),
+//     updatedDate: new Date(),
+//     status: "Active"
+// }
 
 const timeslot = [
-    { id: '0', time: '' },
-    { id: '1', time: '12.00 PM - 13.00 PM' },
-    { id: '2', time: '13.00 PM - 14.00 PM' },
-    { id: '3', time: '14.00 PM - 15.00 PM' },
-    { id: '4', time: '15.00 PM - 16.00 PM' },
-    { id: '5', time: '16.00 PM - 17.00 PM' },
-    { id: '6', time: '17.00 PM - 18.00 PM' },
-    { id: '7', time: '18.00 PM - 19.00 PM' },
+    {id: '0', time: ''},
+    {id: '1', time: '12.00 PM - 13.00 PM'},
+    {id: '2', time: '13.00 PM - 14.00 PM'},
+    {id: '3', time: '14.00 PM - 15.00 PM'},
+    {id: '4', time: '15.00 PM - 16.00 PM'},
+    {id: '5', time: '16.00 PM - 17.00 PM'},
+    {id: '6', time: '17.00 PM - 18.00 PM'},
+    {id: '7', time: '18.00 PM - 19.00 PM'},
 ]
 
 export const Checkout = () => {
     const navigate = useNavigate()
     const today = new Date()
 
-    const { user } = useUserAuth()
+    const {user} = useUserAuth()
     const orderService = newOrderService()
     const productService = useProductService()
+    const CartService = cartService()
 
     const getUser = localStorage.getItem('user');
     const userData = getUser ? JSON.parse(getUser) : null;
 
+
     const [products, setProducts] = useState<Product[]>([]);
+    const [userCart, setUserCart] = useState<CartItem[]>([])
     const [errorMsg, setErrorMsg] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false);
+
 
     const itemRequest: ItemRequest[] = [];
 
     const refreshData = async () => {
-        if (user?.id) {
+        if (user != null) {
             const products = await productService.getAll()
+
+            const res = await CartService.getUserCart(user.id.toString())
+            setUserCart(res)
             setProducts(products)
         }
     }
@@ -83,14 +82,6 @@ export const Checkout = () => {
     useEffect(() => {
         refreshData()
     }, [productService])
-
-    for (let i = 0; i < MockCart.productIds.length; i++) {
-        const item: ItemRequest = {
-            productId: MockCart.productIds[i],
-            quantity: MockCart.quantities[i]
-        };
-        itemRequest.push(item);
-    }
 
     const formatDate = (date: Date) => {
         const year = date.getFullYear();
@@ -109,11 +100,11 @@ export const Checkout = () => {
     })
 
     const orderItems: OrderItems[] = products.map((product) => {
-        const productIndex = MockCart.productIds.indexOf(product.id);
+        const productIndex = userCart.findIndex(obj => obj.productId == product.id);
 
         if (productIndex !== -1) {
             const productPrice = product.price;
-            const productQty = MockCart.quantities[productIndex];
+            const productQty = parseInt(userCart[productIndex].quantity);
             const productSubtotal = (productQty * productPrice);
 
             return {
@@ -145,7 +136,7 @@ export const Checkout = () => {
     })
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData({
             ...formData,
             [name]: value,
@@ -153,7 +144,7 @@ export const Checkout = () => {
     };
 
     const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData({
             ...formData,
             [name]: value,
@@ -161,7 +152,7 @@ export const Checkout = () => {
     };
 
     const handlePaymentChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setPaymentData({
             ...paymentData,
             [name]: value,
@@ -169,7 +160,7 @@ export const Checkout = () => {
     };
 
     const handleCreditCardNumberChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         const replaced = value.replace(/[^\d-]/g, '');
         const formattedValue = replaced.replace(/-/g, '').match(/.{1,4}/g);
         const formattedCreditCardNumber = formattedValue ? formattedValue.join('-') : '';
@@ -181,7 +172,7 @@ export const Checkout = () => {
     };
 
     const handleCvvCodeChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         const replaced = value.replace(/\D/g, '');
 
         setPaymentData({
@@ -191,7 +182,7 @@ export const Checkout = () => {
     };
 
     const handleExpiryDateChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         const replaced = value.replace(/\D/g, '');
 
         if (replaced.length <= 2) {
@@ -229,7 +220,7 @@ export const Checkout = () => {
 
     return (
         <Container>
-            {isLoading && (<LoadingModal />)}
+            {isLoading && (<LoadingModal/>)}
             <h1 className="mt-5">Checkout</h1>
             <Form onSubmit={handleSubmit}>
                 <Card className="shadow-sm mt-4 p-3">
@@ -268,9 +259,10 @@ export const Checkout = () => {
                 <Card className="shadow-sm mt-4 p-3">
                     <Card.Body>
                         <h2 className="mb-3">Products Ordered</h2>
-                        <OrderTable data={orderItems} />
-                        <div className="divider" />
-                        <div className="total-label flex-row-reverse">Total: ${orderItems.reduce((acc, product) => acc + product.productSubtotal, 0)}</div>
+                        <OrderTable data={orderItems}/>
+                        <div className="divider"/>
+                        <div className="total-label flex-row-reverse">Total:
+                            ${orderItems.reduce((acc, product) => acc + product.productSubtotal, 0)}</div>
                     </Card.Body>
                 </Card>
 
@@ -338,7 +330,7 @@ export const Checkout = () => {
                     </Card.Body>
                 </Card>
 
-                <br />
+                <br/>
                 <div className="d-flex flex-row-reverse">
                     <Button variant="primary" type="submit">
                         Place Order
@@ -353,7 +345,7 @@ interface OrderTableProps {
     data: OrderItems[]
 }
 
-const OrderTable = ({ data }: OrderTableProps) => {
+const OrderTable = ({data}: OrderTableProps) => {
     const columns = useMemo(() => [
         columnHelper.accessor('productName', {
             header: () => 'Product Name',
@@ -382,36 +374,36 @@ const OrderTable = ({ data }: OrderTableProps) => {
         <>
             <Table hover>
                 <thead>
-                    {table.getHeaderGroups().map(headerGroup => (
-                        <tr key={headerGroup.id}>
-                            {headerGroup.headers.map(header => (
-                                <th key={header.id} colSpan={header.colSpan}>
-                                    {header.isPlaceholder
-                                        ? null
-                                        : flexRender(
-                                            header.column.columnDef.header,
-                                            header.getContext()
-                                        )}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
+                {table.getHeaderGroups().map(headerGroup => (
+                    <tr key={headerGroup.id}>
+                        {headerGroup.headers.map(header => (
+                            <th key={header.id} colSpan={header.colSpan}>
+                                {header.isPlaceholder
+                                    ? null
+                                    : flexRender(
+                                        header.column.columnDef.header,
+                                        header.getContext()
+                                    )}
+                            </th>
+                        ))}
+                    </tr>
+                ))}
                 </thead>
                 <tbody>
-                    {table.getRowModel().rows.length === 0 ? (
-                        <tr>
-                            <td colSpan={columns.length}>No records found</td>
+                {table.getRowModel().rows.length === 0 ? (
+                    <tr>
+                        <td colSpan={columns.length}>No records found</td>
+                    </tr>
+                ) : (
+                    table.getRowModel().rows.map(row => (
+                        <tr key={row.id}>
+                            {row.getVisibleCells().map(cell => (
+                                <td key={cell.id}>
+                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                </td>
+                            ))}
                         </tr>
-                    ) : (
-                        table.getRowModel().rows.map(row => (
-                            <tr key={row.id}>
-                                {row.getVisibleCells().map(cell => (
-                                    <td key={cell.id}>
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </td>
-                                ))}
-                            </tr>
-                        )))}
+                    )))}
                 </tbody>
             </Table>
         </>
