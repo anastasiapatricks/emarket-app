@@ -77,7 +77,7 @@ export const Checkout = () => {
 
     useEffect(() => {
         refreshData()
-    }, [productService])
+    }, [productService, CartService])
 
     const formatDate = (date: Date) => {
         const year = date.getFullYear();
