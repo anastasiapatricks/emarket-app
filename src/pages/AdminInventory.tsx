@@ -63,8 +63,12 @@ interface InventoryTableProps {
 
 const InventoryTable = ({ data }: InventoryTableProps) => {
     const columns = useMemo(() => [
-        columnHelper.accessor('productID', {}),
-        columnHelper.accessor('amount', {}),
+        columnHelper.accessor('productID', {
+            header: () => 'Product Name',
+        }),
+        columnHelper.accessor('amount', {
+            header: () => 'Stock Count',
+        }),
     ], [])
 
     const table = useReactTable<InventoryResponse>({
@@ -164,7 +168,7 @@ const InventoryModal = ({ existing, show, onCancel, onSubmit }: InventoryModalPr
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group className="mb-3" controlId="productID">
-                        <Form.Label>Product ID</Form.Label>
+                        <Form.Label>Product Name</Form.Label>
                         <Form.Control
                             type="text"
                             name="productID"

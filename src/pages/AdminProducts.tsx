@@ -78,10 +78,19 @@ interface ProductRowActions {
 
 const ProductTable = ({ data, rowActions }: ProductTableProps) => {
     const columns = useMemo(() => [
-        columnHelper.accessor('id', {}),
-        columnHelper.accessor('productName', {}),
-        columnHelper.accessor('description', {}),
-        columnHelper.accessor('price', {}),
+        columnHelper.accessor('id', {
+            header: () => 'Product ID',
+        }),
+        columnHelper.accessor('productName', {
+            header: () => 'Product Name',
+        }),
+        columnHelper.accessor('description', {
+            header: () => 'Description',
+        }),
+        columnHelper.accessor('price', {
+            header: () => 'Price',
+            cell: info => '$' + info.getValue().toFixed(2)
+        }),
         columnHelper.display({
             id: 'actions',
             cell: ({ row }) => <span>

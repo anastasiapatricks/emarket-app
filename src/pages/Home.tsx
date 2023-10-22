@@ -16,7 +16,7 @@ export const Home = () => {
             <h1>User Profile</h1>
             <div className="user-info">
                 <img
-                    src="holder.js/100px180" // Add a profile picture here
+                    src="/img/user.png" // Add a profile picture here
                     className="user-avatar"
                     onError={({ currentTarget }) => {
                         currentTarget.onerror = null; // prevents looping
