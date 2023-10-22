@@ -77,7 +77,7 @@ export const Checkout = () => {
 
     useEffect(() => {
         refreshData()
-    }, [productService, CartService])
+    }, [productService])
 
     const formatDate = (date: Date) => {
         const year = date.getFullYear();
@@ -85,19 +85,6 @@ export const Checkout = () => {
         const day = String(date.getDate()).padStart(2, '0');
 
         return `${year}-${month}-${day}`;
-    }
-
-    const [itemRequest, setItemRequest] = useState<ItemRequest[]>([]);
-
-    useEffect(() => {
-        updateItems();
-    }, [CartService, userCart])
-
-    const updateItems = () => {
-        setItemRequest(userCart.map(product => ({
-            productId: product.productId,
-            quantity: parseInt(product.quantity),
-        })))
     }
 
     const [formData, setFormData] = useState<DeliveryOrderRequest>({
@@ -109,11 +96,18 @@ export const Checkout = () => {
     })
 
     useEffect(() => {
+        const [itemRequest, setItemRequest] = useState<ItemRequest[]>([]);
+
+        setItemRequest(userCart.map(product => ({
+            productId: product.productId,
+            quantity: parseInt(product.quantity),
+        })))
+
         setFormData({
             ...formData,
             items: itemRequest
         })
-    }, itemRequest)
+    }, userCart)
 
     const orderItems: OrderItems[] = products.map((product) => {
         const productIndex = userCart.findIndex(obj => obj.productId == product.id);
@@ -233,8 +227,9 @@ export const Checkout = () => {
             }
         })
     }
-    
+
     console.log(formData)
+    console.log("check form data");
 
     return (
         <Container>
