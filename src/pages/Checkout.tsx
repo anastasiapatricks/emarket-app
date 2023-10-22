@@ -214,6 +214,8 @@ export const Checkout = () => {
             const response: any = await orderService.create(formData, isLoading, setIsLoading);
 
             if (response) {
+                deleteCart();
+
                 navigate(`${'/user/checkout/success/orderNo/'}${response.id}`, {
                     state: {
                         register: true
@@ -225,6 +227,18 @@ export const Checkout = () => {
         } catch (error) {
             setErrorMsg((error as Error).message)
             throw error
+        }
+    }
+
+    const deleteCart = async () => {
+        for (const cart of userCart) {
+            if (user !== null) {
+                try {
+                    await CartService.deleteCartById(user.id.toString(), cart.cartId);
+                } catch (error) {
+                    console.error(`Failed to delete cart with cart_id: ${cart.cartId}`);
+                }
+            }
         }
     }
 
