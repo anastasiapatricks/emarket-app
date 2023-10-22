@@ -87,6 +87,19 @@ export const Checkout = () => {
         return `${year}-${month}-${day}`;
     }
 
+    // const [itemRequest, setItemRequest] = useState<ItemRequest[]>([]);
+
+    // useEffect(() => {
+    //     updateItems();
+    // }, [userCart])
+
+    // const updateItems = () => {
+    //     setItemRequest(userCart.map(product => ({
+    //         productId: product.productId,
+    //         quantity: parseInt(product.quantity),
+    //     })))
+    // }
+
     const [formData, setFormData] = useState<DeliveryOrderRequest>({
         userId: userData ? userData.id : 0,
         items: [],
@@ -94,20 +107,6 @@ export const Checkout = () => {
         timeslot: '',
         address: ''
     })
-
-    useEffect(() => {
-        const [itemRequest, setItemRequest] = useState<ItemRequest[]>([]);
-
-        setItemRequest(userCart.map(product => ({
-            productId: product.productId,
-            quantity: parseInt(product.quantity),
-        })))
-
-        setFormData({
-            ...formData,
-            items: itemRequest
-        })
-    }, userCart)
 
     const orderItems: OrderItems[] = products.map((product) => {
         const productIndex = userCart.findIndex(obj => obj.productId == product.id);
@@ -227,9 +226,6 @@ export const Checkout = () => {
             }
         })
     }
-
-    console.log(formData)
-    console.log("check form data");
 
     return (
         <Container>
