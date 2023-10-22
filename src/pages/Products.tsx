@@ -76,7 +76,7 @@ export const Products: React.FC<ProductsProps> = ({ productsPerPage }) => {
       const res = await CartService.createNewCart(user.id.toString(), newCart);
       console.log(res);
 
-      displayAddToCartNotification('Product added to the cart!', { type: 'success' });
+      displayAddToCartNotification(product.productName + ' added to the cart!', { type: 'success' });
     }
   };
 
