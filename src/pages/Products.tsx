@@ -103,7 +103,7 @@ export const Products: React.FC<ProductsProps> = ({ productsPerPage }) => {
                 marginBottom: '1rem',
                 textAlign: 'center'
               }}>
-                <Card.Img variant="top" src="holder.js/100px180" onError={({ currentTarget }) => {
+                <Card.Img variant="top" src={`/img/products/${product.productName.toLowerCase()}.jpg`} onError={({ currentTarget }) => {
                   currentTarget.onerror = null; // prevents looping
                   currentTarget.src = "https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg";
                 }} />
