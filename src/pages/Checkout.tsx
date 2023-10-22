@@ -288,7 +288,7 @@ export const Checkout = () => {
                         <OrderTable data={orderItems} />
                         <div className="divider" />
                         <div className="total-label flex-row-reverse">Total:
-                            ${orderItems.reduce((acc, product) => acc + product.productSubtotal, 0)}</div>
+                            ${(orderItems.reduce((acc, product) => acc + product.productSubtotal, 0)).toFixed(2)}</div>
                     </Card.Body>
                 </Card>
 
