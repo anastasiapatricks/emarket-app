@@ -65,11 +65,6 @@ export const Checkout = () => {
     const [errorMsg, setErrorMsg] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false);
 
-    const itemRequest: ItemRequest[] = userCart.map(product => ({
-        productId: product.productId,
-        quantity: parseInt(product.quantity),
-    }));
-
     const refreshData = async () => {
         if (user != null) {
             const products = await productService.getAll()
@@ -91,6 +86,11 @@ export const Checkout = () => {
 
         return `${year}-${month}-${day}`;
     }
+
+    const itemRequest: ItemRequest[] = userCart.map(product => ({
+        productId: product.productId,
+        quantity: parseInt(product.quantity),
+    }));
 
     const [formData, setFormData] = useState<DeliveryOrderRequest>({
         userId: userData ? userData.id : 0,
@@ -218,6 +218,8 @@ export const Checkout = () => {
             }
         })
     }
+
+    console.log(formData);
 
     return (
         <Container>
