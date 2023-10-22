@@ -102,11 +102,18 @@ export const Checkout = () => {
 
     const [formData, setFormData] = useState<DeliveryOrderRequest>({
         userId: userData ? userData.id : 0,
-        items: itemRequest,
+        items: [],
         date: formatDate(today),
         timeslot: '',
         address: ''
     })
+
+    useEffect(() => {
+        setFormData({
+            ...formData,
+            items: itemRequest
+        })
+    }, itemRequest)
 
     const orderItems: OrderItems[] = products.map((product) => {
         const productIndex = userCart.findIndex(obj => obj.productId == product.id);
@@ -226,8 +233,7 @@ export const Checkout = () => {
             }
         })
     }
-
-    console.log(itemRequest);
+    
     console.log(formData)
 
     return (
