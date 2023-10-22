@@ -208,25 +208,30 @@ export const Checkout = () => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        setIsLoading(true);
 
-        try {
-            const response: any = await orderService.create(formData, isLoading, setIsLoading);
+        if (formData.items && formData.items.length !== 0) {
+            setIsLoading(true);
 
-            if (response) {
-                deleteCart();
+            try {
+                const response: any = await orderService.create(formData, isLoading, setIsLoading);
 
-                navigate(`${'/user/checkout/success/orderNo/'}${response.id}`, {
-                    state: {
-                        register: true
-                    }
-                })
-            } else {
-                setErrorMsg("Unable to checkout")
+                if (response) {
+                    deleteCart();
+
+                    navigate(`${'/user/checkout/success/orderNo/'}${response.id}`, {
+                        state: {
+                            register: true
+                        }
+                    })
+                } else {
+                    setErrorMsg("Unable to checkout")
+                }
+            } catch (error) {
+                setErrorMsg((error as Error).message)
+                throw error
             }
-        } catch (error) {
-            setErrorMsg((error as Error).message)
-            throw error
+        } else {
+            setErrorMsg("Please add at least one item to cart")
         }
     }
 
@@ -248,11 +253,11 @@ export const Checkout = () => {
         <Container>
             {isLoading && (<LoadingModal />)}
             <h1 className="mt-5">Checkout</h1>
+            {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
             <Form onSubmit={handleSubmit}>
                 <Card className="shadow-sm mt-4 p-3">
                     <Card.Body>
                         <h2 className="mb-3">Delivery</h2>
-                        {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
                         <Form.Group className="mb-3" controlId="name">
                             <Form.Label>Address</Form.Label>
                             <Form.Control
@@ -295,7 +300,6 @@ export const Checkout = () => {
                 <Card className="shadow-sm mt-4 p-3">
                     <Card.Body>
                         <h2 className="mb-3">Payment</h2>
-                        {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
                         <Form.Group className="mb-3" controlId="creditCardNumber">
                             <Form.Label>Credit Card Number</Form.Label>
                             <Form.Control
