@@ -361,6 +361,18 @@ const OrderTable = ({ data }: OrderTableProps) => {
     const columns = useMemo(() => [
         columnHelper.accessor('productName', {
             header: () => 'Product Name',
+            cell: (info) => (
+                <div>
+                    <img
+                        src={`/img/products/${info.row.original.productName.toLowerCase()}.jpg`}
+                        alt={info.row.original.productName}
+                        width="50"
+                        height="50"
+                    />
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    {info.row.original.productName}
+                </div>
+            ),
         }),
         columnHelper.accessor('productDesc', {
             header: () => 'Description',

@@ -133,11 +133,20 @@ interface OrderTableProps {
 
 const OrderTable = ({ data }: OrderTableProps) => {
     const columns = useMemo(() => [
-        columnHelper.accessor('productId', {
-            header: () => 'Product ID',
-        }),
         columnHelper.accessor('name', {
             header: () => 'Product Name',
+            cell: (info) => (
+                <div>
+                    <img
+                        src={`/img/products/${info.row.original.name.toLowerCase()}.jpg`}
+                        alt={info.row.original.name}
+                        width="50"
+                        height="50"
+                    />
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    {info.row.original.name}
+                </div>
+            ),
         }),
         columnHelper.accessor('description', {
             header: () => 'Description',
