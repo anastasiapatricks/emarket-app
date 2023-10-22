@@ -220,6 +220,7 @@ export const Checkout = () => {
     }
 
     console.log(formData);
+    console.log(userCart)
 
     return (
         <Container>
