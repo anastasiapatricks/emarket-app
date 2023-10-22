@@ -30,13 +30,25 @@ export const newOrderService = (config?: AxiosRequestConfig) => {
             return resp.data as Order
         },
         create: async (req: DeliveryOrderRequest, isLoading: any, setIsLoading: any) => {
+            let response = null;
+
             await client
                 .post('/delivery-order/add', req)
-                .then(() => {
+                .then(res => {
+                    if (res.data) {
+                        response = res.data
+                    }
+                })
+                .catch(err => {
+                    response = err.code
+                })
+                .finally(() => {
                     if (isLoading) {
                         setIsLoading(false);
                     }
                 })
+
+            return response;
         },
         update: async (id: number, req: OrderReq) => {
             await client.post(`/delivery-order/edit/${id}`, req)

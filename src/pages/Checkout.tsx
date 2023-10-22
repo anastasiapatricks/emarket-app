@@ -27,16 +27,6 @@ interface Payment {
     creditCardName: string,
 }
 
-// const MockCart: Cart = {
-//     cartId: "1",
-//     userId: "7",
-//     productIds: ["652e95911581362133f17092", "652e95a41581362133f17093", "652e96111581362133f1709a"],
-//     quantities: [3, 5, 6],
-//     createdDate: new Date(),
-//     updatedDate: new Date(),
-//     status: "Active"
-// }
-
 const timeslot = [
     { id: '0', time: '' },
     { id: '1', time: '12.00 PM - 13.00 PM' },
@@ -121,7 +111,7 @@ export const Checkout = () => {
         if (productIndex !== -1) {
             const productPrice = product.price;
             const productQty = parseInt(userCart[productIndex].quantity);
-            const productSubtotal = (productQty * productPrice);
+            const productSubtotal = (productQty * productPrice).toFixed(2);
 
             return {
                 id: product.id,
@@ -129,7 +119,7 @@ export const Checkout = () => {
                 productDesc: product.description,
                 productPrice: productPrice,
                 productQty: productQty,
-                productSubtotal
+                productSubtotal: parseFloat(productSubtotal)
             };
         }
 
@@ -221,17 +211,21 @@ export const Checkout = () => {
         setIsLoading(true);
 
         try {
-            await orderService.create(formData, isLoading, setIsLoading)
+            const response: any = await orderService.create(formData, isLoading, setIsLoading);
+
+            if (response) {
+                navigate(`${'/user/checkout/success/orderNo/'}${response.id}`, {
+                    state: {
+                        register: true
+                    }
+                })
+            } else {
+                setErrorMsg("Unable to checkout")
+            }
         } catch (error) {
             setErrorMsg((error as Error).message)
             throw error
         }
-
-        navigate('/user/checkout/success', {
-            state: {
-                register: true
-            }
-        })
     }
 
     console.log(formData);

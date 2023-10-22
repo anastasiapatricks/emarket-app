@@ -77,7 +77,7 @@ const router = createBrowserRouter([
             element: <Checkout />
           },
           {
-            path: 'checkout/success',
+            path: 'checkout/success/orderNo/:id',
             element: <CheckoutSuccess />
           }
         ]
