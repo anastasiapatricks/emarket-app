@@ -7,6 +7,8 @@ import { Product } from "../models/ProductReqResp"
 import { User } from "../models/User.ts";
 import { cartService } from "../services/CartService.ts";
 import { InputItemCart } from "../models/CartReqResp.ts";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 interface ProductsProps {
@@ -73,13 +75,18 @@ export const Products: React.FC<ProductsProps> = ({ productsPerPage }) => {
       }
       const res = await CartService.createNewCart(user.id.toString(), newCart);
       console.log(res);
-    }
 
+      displayAddToCartNotification('Product added to the cart!', { type: 'success' });
+    }
   };
 
+  const displayAddToCartNotification = (message: any, options: any) => {
+    toast(message, options);
+  }
 
   return (
     <Container>
+      <ToastContainer position="bottom-right" />
       <h1 className='my-3'>Product Catalogue</h1>
 
       <Form>
