@@ -219,7 +219,7 @@ export const Checkout = () => {
         })
     }
 
-    console.log(formData);
+    console.log(itemRequest);
     console.log(userCart)
 
     return (
