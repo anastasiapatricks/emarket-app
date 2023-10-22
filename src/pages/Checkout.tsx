@@ -87,10 +87,18 @@ export const Checkout = () => {
         return `${year}-${month}-${day}`;
     }
 
-    const itemRequest: ItemRequest[] = userCart.map(product => ({
-        productId: product.productId,
-        quantity: parseInt(product.quantity),
-    }));
+    const [itemRequest, setItemRequest] = useState<ItemRequest[]>([]);
+
+    useEffect(() => {
+        updateItems();
+    }, [CartService, userCart])
+
+    const updateItems = () => {
+        setItemRequest(userCart.map(product => ({
+            productId: product.productId,
+            quantity: parseInt(product.quantity),
+        })))
+    }
 
     const [formData, setFormData] = useState<DeliveryOrderRequest>({
         userId: userData ? userData.id : 0,
@@ -220,7 +228,7 @@ export const Checkout = () => {
     }
 
     console.log(itemRequest);
-    console.log(userCart)
+    console.log(formData)
 
     return (
         <Container>
